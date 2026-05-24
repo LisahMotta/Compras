@@ -976,7 +976,7 @@
     <div class="header-icons">
       <button class="icon-btn" id="btnTheme" title="Alternar tema">🌙</button>
       <button class="icon-btn" id="btnPrint" title="Imprimir lista">🖨️</button>
-      <button class="icon-btn" id="btnNotif" title="Alertas">🔔</button>
+      <button class="icon-btn" id="btnNotif" title="Instalar app">📲</button>
       <button class="icon-btn" id="btnClear" title="Limpar comprados">✓</button>
     </div>
   </div>
@@ -996,6 +996,18 @@
   </div>
   <button class="btn-install" id="btnInstall">Instalar</button>
   <button class="install-close" id="btnInstallClose">✕</button>
+</div>
+
+<!-- MODAL INSTALAÇÃO -->
+<div class="print-modal-overlay" id="installModalOverlay">
+  <div class="print-modal">
+    <h2>📲 Instalar app</h2>
+    <div id="installModalContent"></div>
+    <div style="margin-top:20px">
+      <button class="btn-save" id="btnInstallModal" style="width:100%;display:none">⬇️ Instalar agora</button>
+      <button class="btn-cancel" id="btnInstallModalClose" style="width:100%;margin-top:10px">Fechar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ALERTA BARRA -->
@@ -1567,6 +1579,8 @@ applyTheme(currentTheme);
 
 // ─── PWA INSTALL ──────────────────────────────────────────────────
 let deferredPrompt = null;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -1590,6 +1604,68 @@ window.addEventListener('appinstalled', () => {
   document.getElementById('installBanner').classList.remove('visible');
   deferredPrompt = null;
 });
+
+document.getElementById('btnNotif').onclick = () => {
+  const content = document.getElementById('installModalContent');
+  const btnInstallModal = document.getElementById('btnInstallModal');
+
+  if (isInStandaloneMode) {
+    content.innerHTML = '<p style="color:var(--green);font-size:15px;margin-bottom:8px">✅ App já instalado!</p><p style="color:var(--muted);font-size:13px">Você já está usando o Despensa como app instalado.</p>';
+    btnInstallModal.style.display = 'none';
+  } else if (deferredPrompt) {
+    content.innerHTML = '<p style="color:var(--text);font-size:14px;margin-bottom:8px">Instale o app para acessar rapidamente sem precisar do navegador.</p>';
+    btnInstallModal.style.display = 'block';
+    btnInstallModal.onclick = async () => {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('installModalOverlay').classList.remove('open');
+      document.getElementById('installBanner').classList.remove('visible');
+    };
+  } else if (isIOS) {
+    content.innerHTML = `
+      <p style="color:var(--text);font-size:14px;margin-bottom:16px">Para instalar no iPhone/iPad:</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">1️⃣</span>
+          <span style="font-size:13px;color:var(--muted)">Toque no botão <strong style="color:var(--text)">Compartilhar</strong> <span style="font-size:18px">⬆️</span> na barra do Safari</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">2️⃣</span>
+          <span style="font-size:13px;color:var(--muted)">Role até <strong style="color:var(--text)">"Adicionar à Tela de Início"</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">3️⃣</span>
+          <span style="font-size:13px;color:var(--muted)">Toque em <strong style="color:var(--text)">Adicionar</strong> no canto superior direito</span>
+        </div>
+      </div>`;
+    btnInstallModal.style.display = 'none';
+  } else {
+    content.innerHTML = `
+      <p style="color:var(--text);font-size:14px;margin-bottom:16px">Para instalar no Android/Chrome:</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">1️⃣</span>
+          <span style="font-size:13px;color:var(--muted)">Toque no menu <strong style="color:var(--text)">⋮</strong> do Chrome</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">2️⃣</span>
+          <span style="font-size:13px;color:var(--muted)">Selecione <strong style="color:var(--text)">"Adicionar à tela inicial"</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">3️⃣</span>
+          <span style="font-size:13px;color:var(--muted)">Confirme tocando em <strong style="color:var(--text)">Adicionar</strong></span>
+        </div>
+      </div>`;
+    btnInstallModal.style.display = 'none';
+  }
+
+  document.getElementById('installModalOverlay').classList.add('open');
+};
+
+document.getElementById('btnInstallModalClose').onclick = () => {
+  document.getElementById('installModalOverlay').classList.remove('open');
+};
 
 // ─── IMPRESSÃO ────────────────────────────────────────────────────
 let printBgColor = 'white';
