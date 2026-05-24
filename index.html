@@ -636,6 +636,222 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
+    /* MODAL DE IMPRESSÃO */
+    .print-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .print-modal-overlay.open {
+      display: flex;
+    }
+
+    .print-modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 24px;
+      width: 90%;
+      max-width: 340px;
+      animation: slideIn 0.3s ease;
+    }
+
+    .print-modal h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .print-modal > p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .color-options {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .color-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .color-swatch {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      border: 3px solid transparent;
+      transition: all 0.15s;
+      position: relative;
+      outline: 2px solid #2a2a4a;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.08);
+    }
+
+    .color-swatch.selected {
+      border-color: var(--accent);
+      outline-color: var(--accent);
+    }
+
+    .color-swatch.selected::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .color-swatch-white { background: #ffffff; }
+    .color-swatch-yellow { background: #fff9c4; }
+    .color-swatch-green { background: #c8f0dc; }
+    .color-swatch-blue { background: #c9e4f8; }
+
+    .color-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .print-actions {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 10px;
+    }
+
+    /* CABEÇALHO DE IMPRESSÃO */
+    .print-header {
+      display: none;
+    }
+
+    /* ESTILOS DE IMPRESSÃO */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+      header, .alerts-bar, .fab, .modal-overlay, .print-modal-overlay,
+      .search-box, .categories, .product-actions, .delete-btn,
+      #tab-estoque, #tab-historico { display: none !important; }
+
+      body {
+        color: #111 !important;
+        font-size: 12pt;
+        min-height: unset;
+      }
+
+      body.print-bg-white { background: #ffffff !important; }
+      body.print-bg-yellow { background: #fff9c4 !important; }
+      body.print-bg-green { background: #c8f0dc !important; }
+      body.print-bg-blue { background: #c9e4f8 !important; }
+
+      main {
+        max-width: 100%;
+        padding: 16px;
+      }
+
+      .tab-content { display: none !important; }
+      #tab-lista { display: block !important; }
+
+      .print-header {
+        display: block !important;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 12px;
+      }
+
+      .print-header h2 {
+        font-family: 'Fraunces', serif;
+        font-size: 22pt;
+        font-weight: 900;
+        color: #111;
+        margin-bottom: 4px;
+      }
+
+      .print-header p {
+        font-size: 10pt;
+        color: #555;
+      }
+
+      .section-title {
+        font-size: 9pt;
+        color: #555;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 4px;
+        margin-bottom: 12px;
+      }
+
+      .product-list {
+        gap: 6px;
+      }
+
+      .product-card {
+        background: transparent !important;
+        border: 1px solid #bbb !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        gap: 10px;
+      }
+
+      .product-card::before { display: none !important; }
+
+      .product-emoji {
+        background: transparent !important;
+        font-size: 20px;
+        width: 36px;
+        height: 36px;
+      }
+
+      .product-name { color: #111 !important; font-size: 12pt; }
+      .product-qty { color: #555 !important; font-size: 10pt; }
+
+      .status-badge {
+        font-size: 9pt;
+        border: 1px solid #ccc;
+        background: transparent !important;
+        color: #333 !important;
+        padding: 1px 6px;
+      }
+
+      .badge-danger { border-color: #cc3300 !important; color: #cc3300 !important; }
+      .badge-warning { border-color: #997700 !important; color: #997700 !important; }
+      .badge-ok { border-color: #006644 !important; color: #006644 !important; }
+      .badge-bought { border-color: #999 !important; color: #999 !important; }
+
+      .consumption-hint { color: #888 !important; font-size: 9pt; }
+
+      .empty { display: none !important; }
+
+      .print-checkbox {
+        display: inline-block !important;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #555;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+    }
+
     /* COMPRA HISTORICO */
     .history-item {
       background: var(--card);
@@ -669,10 +885,17 @@
 </head>
 <body>
 
+<!-- CABEÇALHO IMPRESSO -->
+<div class="print-header" id="printHeader">
+  <h2>🛒 Lista de Compras</h2>
+  <p id="printDate"></p>
+</div>
+
 <header>
   <div class="header-top">
     <h1>Despensa<span>.</span></h1>
     <div class="header-icons">
+      <button class="icon-btn" id="btnPrint" title="Imprimir lista">🖨️</button>
       <button class="icon-btn" id="btnNotif" title="Alertas">🔔</button>
       <button class="icon-btn" id="btnClear" title="Limpar comprados">✓</button>
     </div>
@@ -739,6 +962,36 @@
 </main>
 
 <button class="fab" id="fabAdd">+</button>
+
+<!-- MODAL IMPRESSÃO -->
+<div class="print-modal-overlay" id="printModalOverlay">
+  <div class="print-modal">
+    <h2>🖨️ Imprimir Lista</h2>
+    <p>Escolha a cor de fundo para impressão:</p>
+    <div class="color-options">
+      <div class="color-option" onclick="selectPrintColor('white')">
+        <div class="color-swatch color-swatch-white selected" data-color="white"></div>
+        <span class="color-label">Branco</span>
+      </div>
+      <div class="color-option" onclick="selectPrintColor('yellow')">
+        <div class="color-swatch color-swatch-yellow" data-color="yellow"></div>
+        <span class="color-label">Amarelo</span>
+      </div>
+      <div class="color-option" onclick="selectPrintColor('green')">
+        <div class="color-swatch color-swatch-green" data-color="green"></div>
+        <span class="color-label">Verde</span>
+      </div>
+      <div class="color-option" onclick="selectPrintColor('blue')">
+        <div class="color-swatch color-swatch-blue" data-color="blue"></div>
+        <span class="color-label">Azul</span>
+      </div>
+    </div>
+    <div class="print-actions">
+      <button class="btn-cancel" id="btnPrintCancel">Cancelar</button>
+      <button class="btn-save" id="btnPrintConfirm">🖨️ Imprimir</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL ADICIONAR -->
 <div class="modal-overlay" id="modalOverlay">
@@ -1188,6 +1441,32 @@ function loadDemo() {
 loadDemo();
 renderEmojiGrid();
 render();
+
+// ─── IMPRESSÃO ────────────────────────────────────────────────────
+let printBgColor = 'white';
+
+function selectPrintColor(color) {
+  printBgColor = color;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  document.querySelector(`.color-swatch[data-color="${color}"]`).classList.add('selected');
+}
+
+document.getElementById('btnPrint').onclick = () => {
+  document.getElementById('printModalOverlay').classList.add('open');
+};
+
+document.getElementById('btnPrintCancel').onclick = () => {
+  document.getElementById('printModalOverlay').classList.remove('open');
+};
+
+document.getElementById('btnPrintConfirm').onclick = () => {
+  document.getElementById('printModalOverlay').classList.remove('open');
+  document.body.classList.remove('print-bg-white', 'print-bg-yellow', 'print-bg-green', 'print-bg-blue');
+  document.body.classList.add(`print-bg-${printBgColor}`);
+  const now = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('printDate').textContent = now;
+  setTimeout(() => window.print(), 100);
+};
 
 // ─── SERVICE WORKER ───────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
