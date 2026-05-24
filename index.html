@@ -11,6 +11,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
+      --bg: #f5f4f9;
+      --bg2: #ffffff;
+      --bg3: #ededf4;
+      --card: #ffffff;
+      --border: #dcdce8;
+      --text: #1a1a2e;
+      --muted: #7878a0;
+      --accent: #ff6b6b;
+      --accent2: #d4a000;
+      --green: #059669;
+      --blue: #0e7ab0;
+      --purple: #7c3aed;
+      --radius: 16px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="dark"] {
       --bg: #0f0f1a;
       --bg2: #16162a;
       --bg3: #1e1e36;
@@ -18,12 +35,10 @@
       --border: #2a2a4a;
       --text: #e8e8f5;
       --muted: #7878aa;
-      --accent: #ff6b6b;
       --accent2: #ffd166;
       --green: #06d6a0;
       --blue: #118ab2;
       --purple: #9b5de5;
-      --radius: 16px;
       --shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
@@ -39,13 +54,14 @@
 
     /* HEADER */
     header {
-      background: linear-gradient(135deg, #1a1a30 0%, #0f0f1a 100%);
+      background: linear-gradient(135deg, var(--bg2) 0%, var(--bg) 100%);
       padding: 24px 20px 16px;
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 100;
       backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
     }
 
     .header-top {
@@ -119,11 +135,62 @@
       color: white;
     }
 
+    /* BANNER INSTALAR PWA */
+    .install-banner {
+      margin: 12px 16px 0;
+      background: linear-gradient(135deg, var(--bg2), var(--bg3));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.3s ease;
+    }
+
+    .install-banner.visible { display: flex; }
+
+    .install-icon { font-size: 24px; flex-shrink: 0; }
+
+    .install-text { flex: 1; }
+
+    .install-text strong {
+      color: var(--text);
+      font-size: 13px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .install-text span { color: var(--muted); font-size: 12px; }
+
+    .btn-install {
+      background: var(--purple);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .install-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
     /* ALERTAS */
     .alerts-bar {
-      margin: 16px;
-      background: linear-gradient(135deg, #2a1a1a, #1e1a2a);
-      border: 1px solid #ff6b6b44;
+      margin: 12px 16px 0;
+      background: linear-gradient(135deg, var(--bg3), var(--bg2));
+      border: 1px solid rgba(255,107,107,0.35);
       border-radius: var(--radius);
       padding: 14px 16px;
       display: none;
@@ -895,6 +962,7 @@
   <div class="header-top">
     <h1>Despensa<span>.</span></h1>
     <div class="header-icons">
+      <button class="icon-btn" id="btnTheme" title="Alternar tema">🌙</button>
       <button class="icon-btn" id="btnPrint" title="Imprimir lista">🖨️</button>
       <button class="icon-btn" id="btnNotif" title="Alertas">🔔</button>
       <button class="icon-btn" id="btnClear" title="Limpar comprados">✓</button>
@@ -906,6 +974,17 @@
     <button class="tab" data-tab="historico">📊 Consumo</button>
   </div>
 </header>
+
+<!-- BANNER INSTALAR -->
+<div class="install-banner" id="installBanner">
+  <span class="install-icon">📲</span>
+  <div class="install-text">
+    <strong>Instalar Despensa</strong>
+    <span>Adicione à tela inicial</span>
+  </div>
+  <button class="btn-install" id="btnInstall">Instalar</button>
+  <button class="install-close" id="btnInstallClose">✕</button>
+</div>
 
 <!-- ALERTA BARRA -->
 <div class="alerts-bar" id="alertsBar">
@@ -1441,6 +1520,48 @@ function loadDemo() {
 loadDemo();
 renderEmojiGrid();
 render();
+
+// ─── TEMA ─────────────────────────────────────────────────────────
+let currentTheme = localStorage.getItem('despensa_theme') || 'light';
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('btnTheme').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('despensa_theme', theme);
+  currentTheme = theme;
+}
+
+document.getElementById('btnTheme').onclick = () => {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+};
+
+applyTheme(currentTheme);
+
+// ─── PWA INSTALL ──────────────────────────────────────────────────
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('visible');
+});
+
+document.getElementById('btnInstall').onclick = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('visible');
+};
+
+document.getElementById('btnInstallClose').onclick = () => {
+  document.getElementById('installBanner').classList.remove('visible');
+};
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('visible');
+  deferredPrompt = null;
+});
 
 // ─── IMPRESSÃO ────────────────────────────────────────────────────
 let printBgColor = 'white';
