@@ -1,4 +1,4 @@
-const CACHE = 'despensa-v1';
+const CACHE = 'despensa-v2';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
